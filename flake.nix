@@ -4,10 +4,10 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-compat.url = "github:edolstra/flake-compat";
-    plutolang = "github:
+    plutolang = "github:plutolang/pluto";
   };
 
-  outputs = { self, nixpkgs, ... }: {
+  outputs = { self, nixpkgs, plutolang, ... }: {
 
     packages.x86_64-linux.pluto-compat =
       with import nixpkgs { system = "x86_64-linux"; };
@@ -27,6 +27,9 @@
         '';
         installPhase = ''
           install -Dm644 -t $out/include pluto-compat.h
+          for x in lua lauxlib lualib; do
+            ln -s $out/include/pluto-compat.h $out/include/$x.h
+          done
         '';
         shellHook = ''
           export CFLAGS="$NIX_CFLAGS_COMPILE -I${plutolang.out}"
